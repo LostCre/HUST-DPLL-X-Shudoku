@@ -49,6 +49,6 @@ bool isEmpty(LinkHead *Head);
 void addLiteral(LinkHead *Head, int data, LinkNode **pre);
 int chooseData(LinkHead *Head);
 /*输出函数*/
-void printRes(void);
+void printRes(bool res);
 
 #endif

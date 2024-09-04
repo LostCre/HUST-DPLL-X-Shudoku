@@ -44,7 +44,11 @@ int main(void)
     //     printf("\n");
     // }
     // if(DPLL(Head))
-    //     printRes();
-
+    clock_t start, end;
+    start = clock();
+    bool res = DPLL(Head);
+    end = clock();
+    printRes(res);
+    fprintf("%d ms", (end - start) / CLOCKS_PER_SEC * 1000);
     return 0;
 }

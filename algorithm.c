@@ -278,7 +278,6 @@ void destoryCNF(LinkHead *head)
 }
 bool DPLL(LinkHead *Head)
 {
-    
     int count = 0;   
     findContradiction = false;
 

@@ -103,3 +103,28 @@ void cnfParser(void) // 解析cnf文件
 
     free(pre); //释放空间
 }
+void printRes(bool res)
+{
+    FILE *fp;
+    if((fp = fopen("test.res", "w")) == NULL)
+    {
+        printf("Open file failed!\n");
+        exit(1);
+    }
+    
+    fprintf(fp, "s  ");
+    if(res)
+        fprintf(fp, "1\n");
+    else
+        fprintf(fp, "0\n");
+
+    fprintf(fp, "v  ");
+    for(int i = 1; i <= n; ++i)
+    {
+        if(var[i] == 1)
+            fprintf(fp, "%d ", i);
+        else
+            fprintf(fp, "%d ", var[i] * i);
+    }
+    fprintf(fp, "v  ");
+}
