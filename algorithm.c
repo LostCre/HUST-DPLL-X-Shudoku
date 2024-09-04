@@ -240,7 +240,21 @@ int chooseData(LinkHead *Head)
 }
 void destoryCNF(LinkHead *head)
 {
-
+    LinkHead *p = head->next_head;
+    while(p != NULL)
+    {
+        LinkNode *q = p->next;
+        while(q != NULL)
+        {
+            LinkNode *temp = q;
+            q = q->next;
+            free(temp);
+        }
+        LinkHead *temp = p;
+        p = p->next_head;
+        free(temp);
+    }
+    free(head);
 }
 bool DPLL(LinkHead *Head)
 {
@@ -251,7 +265,15 @@ bool DPLL(LinkHead *Head)
     while (UnitPropagate(Head))
         count++; // 查找单子句，并化简
     if (findContradiction)
+    {
+        for(int i = 1; i <= count; ++i)
+        {
+            int x;
+            pop(&s, &x);
+            var[x] = -1;
+        }
         return false;
+    }
     
     if(isEmpty(Head))
         return true;
@@ -261,6 +283,12 @@ bool DPLL(LinkHead *Head)
     if(DPLL(newHead))
     {
         destoryCNF(newHead);
+        for(int i = 1; i <= count; ++i)
+        {
+            int x;
+            pop(&s, &x);
+            var[x] = -1;
+        }
         return true;
     }
     else
@@ -268,6 +296,12 @@ bool DPLL(LinkHead *Head)
         newHead = literalCopy(Head, -data);
         bool flag = DPLL(newHead);
         destoryCNF(newHead);
+        for(int i = 1; i <= count; ++i)
+        {
+            int x;
+            pop(&s, &x);
+            var[x] = -1;
+        }
         return flag;
     }
 
