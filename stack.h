@@ -1,4 +1,7 @@
 /*本文档用于存储与栈相关的函数定义*/
+#ifndef _STACK_H
+#define _STACK_H
+
 #include <stdlib.h>
 struct stack
 {
@@ -8,22 +11,9 @@ struct stack
 };
 typedef struct stack stack;
 
-void initStack(stack *s, int m)
-{
-    s->size = m;
-    s->top = 0;
-    s->elem = (int *)malloc(sizeof(int) * (m + 1));
-}
-void push(stack *s, int i)
-{
-    s->elem[s->top++] = i;
-}
-void pop(stack *s, int *x)
-{
-    *x = s->elem[s->top--];
-}
-void destroyStack(stack *s)
-{
-    s->size = s->top = 0;
-    free(s->elem);
-}
+void initStack(stack *s, int m);
+void push(stack *s, int i);
+void pop(stack *s, int *x);
+void destroyStack(stack *s);
+
+#endif

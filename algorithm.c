@@ -7,7 +7,8 @@
 extern int n, m;
 extern int *var;
 bool findContradiction;
-stack s;
+extern stack s;
+
 bool UnitPropagate(LinkHead *Head)
 {
     LinkHead *p = Head->next_head;
@@ -25,6 +26,7 @@ bool UnitPropagate(LinkHead *Head)
             {
                 var[abs(p->next->data)] = p->next->data < 0 ? 0 : 1; // 将单子句设置为真
                 PureLiteralAssign(Head, p->next);             // 将其他含有该变量的子句进行简化
+                push(&s, abs(p->next->data));
                 return true;
             }
             else if (var[p->next->data == 1]) // 有可能出现具有相同变量单子句
@@ -84,15 +86,19 @@ void PureLiteralAssign(LinkHead *Head, LinkNode *p)
         down = down->down;
     }
 }
-LinkHead *literalCopy(LinkHead *Head) // 复制子句
+LinkHead *literalCopy(LinkHead *Head, int data) // 复制子句
 {
     LinkHead *newHead = (LinkHead *)malloc(sizeof(LinkHead));
     newHead->next_head = NULL;
-    
+
     /*初始化pre*/
     LinkNode **pre = (LinkNode **)malloc(sizeof(LinkNode *) * (2 * n + 1)); // 存储每个变元上一次出现的位置
     for(int i = 0; i <= 2 * n; ++i)
         pre[i] = NULL; // 初始化为NULL
+
+    addLiteral(newHead, data, pre);
+    LinkHead *temp = newHead;
+    newHead = newHead->next_head;
 
     /*初始化原子句遍历起点*/
     LinkHead *p = Head->next_head; //用于遍历原子句
@@ -135,10 +141,11 @@ LinkHead *literalCopy(LinkHead *Head) // 复制子句
             pre[i]->down = NULL;
         }
     }
+
     free(pre);
 
     new_p->next_head = NULL;
-    return newHead;
+    return temp;
 }
 void headCopy(const LinkHead *s, LinkHead *t, LinkNode **pre) // 将s的子句复制到t的next_head
 {
@@ -191,14 +198,77 @@ void headCopy(const LinkHead *s, LinkHead *t, LinkNode **pre) // 将s的子句�
     }
     q->next = NULL;
 }
+bool isEmpty(LinkHead *Head)
+{
+    if(Head->next_head == NULL)
+        return true;
+    bool flag = true;
+    LinkHead *p = Head->next_head;
+    while(flag && p != NULL)
+    {
+        if(!p->is_simplified)
+            flag = false;
+
+        p = p->next_head;
+    }
+}
+void addLiteral(LinkHead *Head, int data, LinkNode **pre)
+{
+    /*newLiteral的head信息填入*/
+    LinkHead *newLiteral = (LinkHead *)malloc(sizeof(LinkHead));
+    newLiteral->is_simplified = false;
+    newLiteral->var_num = 1919810;
+
+    /*newLiteral的node信息初始化*/
+    newLiteral->next = (LinkNode *)malloc(sizeof(LinkNode));
+    newLiteral->next->data = data;
+    newLiteral->next->up = NULL;
+    newLiteral->next->head = newLiteral;
+    newLiteral->next->down = NULL;
+    newLiteral->next->next = NULL;
+    pre[data + n] = newLiteral->next;
+
+    /*将新句子接到句首*/
+    Head->next_head = newLiteral;
+    newLiteral->next_head = NULL;
+}
+int chooseData(LinkHead *Head)
+{
+    int data;
+
+    return data;
+}
+void destoryCNF(LinkHead *head)
+{
+
+}
 bool DPLL(LinkHead *Head)
 {
-    // initStack(&s, m);
+    
+    int count = 0;   
     findContradiction = false;
 
-    while (UnitPropagate(Head)); // 查找单子句，并化简
+    while (UnitPropagate(Head))
+        count++; // 查找单子句，并化简
     if (findContradiction)
         return false;
     
+    if(isEmpty(Head))
+        return true;
+
+    int data = chooseData(Head);
+    LinkHead *newHead = literalCopy(Head, data);
+    if(DPLL(newHead))
+    {
+        destoryCNF(newHead);
+        return true;
+    }
+    else
+    {
+        newHead = literalCopy(Head, -data);
+        bool flag = DPLL(newHead);
+        destoryCNF(newHead);
+        return flag;
+    }
 
 }

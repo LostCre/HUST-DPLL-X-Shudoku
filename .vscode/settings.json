@@ -6,6 +6,7 @@
         "stdio.h": "c",
         "stdbool.h": "c",
         "math.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "stack.h": "c"
     }
 }

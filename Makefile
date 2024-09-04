@@ -1,16 +1,20 @@
-object = cnfProcess.o algorithm.o  main.o 
+object = stack.o cnfProcess.o \
+		algorithm.o  main.o 
 
-SAT_Solver: main.o algorithm.o cnfProcess.o
+SAT_Solver: ${object}
 	gcc -o SAT_Solver ${object}
 
-main.o: main.c def.h
+main.o: main.c def.h stack.h
 	gcc -g -c main.c
 
 algorithm.o: algorithm.c def.h stack.h
 	gcc -g -c algorithm.c
 
-cnfProcess.o: cnfProcess.c def.h 
+cnfProcess.o: cnfProcess.c def.h
 	gcc -g -c cnfProcess.c
+
+stack.o: stack.c stack.h
+	gcc -g -c stack.c
 
 .PHONY: clean
 clean:

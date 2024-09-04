@@ -1,3 +1,6 @@
+#ifndef DEF_H
+#define DEF_H
+
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
@@ -33,13 +36,19 @@ void cnfParser(void); // 解析cnf文件
 // bool isPureClause(LinkHead *p); //判断是否为纯文字子句
 // bool isContradiction(LinkHead *p); //判断是否为矛盾子句
 bool evaluateClause(LinkHead *p); // 判断子句真值
+void destoryCNF(LinkHead *head);
+
 
 /*DPLL中的执行函数函数*/
 bool DPLL(LinkHead *Head);
 bool UnitPropagate(LinkHead *Head);
 void PureLiteralAssign(LinkHead *Head, LinkNode *p);
-LinkHead *literalCopy(LinkHead *Head);
+LinkHead *literalCopy(LinkHead *Head, int data);
 void headCopy(const LinkHead *s, LinkHead *t, LinkNode **pre);
-
+bool isEmpty(LinkHead *Head);
+void addLiteral(LinkHead *Head, int data, LinkNode **pre);
+int chooseData(LinkHead *Head);
 /*输出函数*/
 void printRes(void);
+
+#endif
