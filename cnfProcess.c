@@ -102,8 +102,9 @@ void cnfParser(void) // 解析cnf文件
     }
 
     free(pre); //释放空间
+    fclose(fp);
 }
-void printRes(bool res)
+void printRes(bool res, double cost)
 {
     FILE *fp;
     if((fp = fopen("test.res", "w")) == NULL)
@@ -126,5 +127,7 @@ void printRes(bool res)
         else
             fprintf(fp, "%d ", var[i] * i);
     }
-    fprintf(fp, "v  ");
+    fprintf(fp, "v  %lf ms\n", cost);
+
+    fclose(fp);
 }
