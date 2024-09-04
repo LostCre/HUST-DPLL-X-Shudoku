@@ -17,7 +17,7 @@ void initStack(stack *s, int m)
 void push(stack *s, int i)
 {
     s->elem[s->top++] = i;
-}   
+}
 void pop(stack *s, int *x)
 {
     *x = s->elem[s->top--];

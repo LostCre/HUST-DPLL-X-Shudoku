@@ -27,17 +27,19 @@ void cnfParser(void) // 解析cnf文件
     memset(var, -1, sizeof(int) * (n + 1));
 
     LinkNode **pre = (LinkNode **)malloc(sizeof(LinkNode *) * (2 * n + 1)); // 存储每个变元上一次出现的位置
-    for (int i = 1; i <= 2 * n; ++i)
+    for (int i = 0; i <= 2 * n; ++i)
         pre[i] = NULL; // 初始化为NULL
+
     /*开始读入子句*/
     LinkHead *p;
     p = (LinkHead *)malloc(sizeof(LinkHead));
-    Head = p;
+    Head = (LinkHead *)malloc(sizeof(LinkHead));
+    Head->next_head = p;
     for (int i = 1; i <= m; ++i, p = p->next_head)
     {
-        p->is_empty = true;
         p->next = NULL;
         p->var_num = 0;
+        p->is_simplified = false;
 
         int x;
         fscanf(fp, " %d", &x);
@@ -45,12 +47,10 @@ void cnfParser(void) // 解析cnf文件
         if (x != 0)
         {
             p->var_num++;
-            p->is_empty = false;
             p->next = (LinkNode *)malloc(sizeof(LinkNode));
 
             current = p->next;
-            current->data = abs(x);
-            current->is_xor = x > 0 ? false : true;
+            current->data = x;
             current->head = p;
 
             if (pre[x + n] != NULL) // 之前x(带符号)已经出现过
@@ -72,8 +72,7 @@ void cnfParser(void) // 解析cnf文件
             current->next = (LinkNode *)malloc(sizeof(LinkNode));
             current = current->next;
 
-            current->data = abs(x);
-            current->is_xor = x > 0 ? false : true;
+            current->data = x;
             current->next = NULL;
             current->head = p;
 
@@ -87,11 +86,20 @@ void cnfParser(void) // 解析cnf文件
             fscanf(fp, " %d", &x);
         }
 
-        p->next_head = (LinkHead *)malloc(sizeof(LinkHead));
+        if(i != m)
+            p->next_head = (LinkHead *)malloc(sizeof(LinkHead));
+        else
+            p->next_head = NULL;
     }
     /*将所有最后出现的变量的down设置为NULL*/
-    for(int i = 1; i <= 2 * n; ++i)
+    for (int i = 1; i < n; ++i)
     {
         pre[i]->down = NULL;
     }
+    for(int i = n + 1; i <= 2 * n; ++i)
+    {
+        pre[i]->down = NULL;
+    }
+
+    free(pre); //释放空间
 }
