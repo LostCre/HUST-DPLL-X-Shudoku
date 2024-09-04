@@ -51,12 +51,15 @@ void cnfParser(void) // 解析cnf文件
             current = p->next;
             current->data = abs(x);
             current->is_xor = x > 0 ? false : true;
+            current->head = p;
 
             if (pre[x + n] != NULL) // 之前x(带符号)已经出现过
             {
                 pre[x + n]->down = current;
                 current->up = pre[x + n];
             }
+            else
+                current->up = NULL;
             pre[x + n] = current; // 存储x的第一个位置
         }
         else
@@ -72,6 +75,7 @@ void cnfParser(void) // 解析cnf文件
             current->data = abs(x);
             current->is_xor = x > 0 ? false : true;
             current->next = NULL;
+            current->head = p;
 
             if (pre[x + n] != NULL) // 之前x(带符号)已经出现过
             {
@@ -84,5 +88,10 @@ void cnfParser(void) // 解析cnf文件
         }
 
         p->next_head = (LinkHead *)malloc(sizeof(LinkHead));
+    }
+    /*将所有最后出现的变量的down设置为NULL*/
+    for(int i = 1; i <= 2 * n; ++i)
+    {
+        pre[i]->down = NULL;
     }
 }
