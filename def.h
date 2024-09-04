@@ -8,10 +8,11 @@
 /*存储cnf格式*/
 struct LinkNode
 {
-    bool is_deleted; //是否被删除(默认为否)
     bool is_xor;    //是否是非(默认为否)
     int data;       //变元的编号
     struct LinkNode *next;
+    struct LinkNode *down; //指向下一个相同变元
+    struct LinkNode *up; //指向上一个相同变元
 };      //以带头节点的链表作为子句，头节点可以表示其是否为空子句以及其变元个数
 typedef struct LinkNode LinkNode;
 
