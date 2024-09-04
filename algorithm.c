@@ -235,7 +235,27 @@ void addLiteral(LinkHead *Head, int data, LinkNode **pre)
 int chooseData(LinkHead *Head)
 {
     int data;
-
+    LinkHead *p = Head->next_head;
+    while(p != NULL)
+    {
+        if(!p->is_simplified)
+        {
+            LinkNode *q = p->next;
+            bool flag = false;  //标识是否找到未赋值变量
+            while(q != NULL)
+            {
+                if(var[abs(q->data)] == -1)
+                {
+                    data = q->data;
+                    flag = true;
+                    break;
+                }
+            }
+            if(flag)
+                break;
+        }
+        p = p->next_head;
+    }
     return data;
 }
 void destoryCNF(LinkHead *head)
@@ -304,5 +324,4 @@ bool DPLL(LinkHead *Head)
         }
         return flag;
     }
-
 }
