@@ -316,12 +316,6 @@ bool DPLL(LinkHead *Head)
     if(DPLL(newHead))
     {
         destoryCNF(newHead);
-        for(int i = 1; i <= count; ++i)
-        {
-            int x;
-            pop(&s, &x);
-            var[x] = -1;
-        }
         return true;
     }
     else
@@ -329,11 +323,14 @@ bool DPLL(LinkHead *Head)
         newHead = literalCopy(Head, -data);
         bool flag = DPLL(newHead);
         destoryCNF(newHead);
-        for(int i = 1; i <= count; ++i)
+        if(!flag)
         {
-            int x;
-            pop(&s, &x);
-            var[x] = -1;
+            for(int i = 1; i <= count; ++i)
+            {
+                int x;
+                pop(&s, &x);
+                var[x] = -1;
+            }
         }
         return flag;
     }

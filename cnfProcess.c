@@ -4,10 +4,10 @@ extern int n, m;       // n为文字数量，m为子句数量
 extern int *var;       // 各个布尔变元的真值情况
 extern LinkHead *Head; // 存储子句的链表
 
-void cnfParser(void) // 解析cnf文件
+void cnfParser(char *fileName) // 解析cnf文件
 {
     /*打开文件*/
-    FILE *fp = fopen("test.cnf", "r");
+    FILE *fp = fopen(fileName, "r");
     if (fp == NULL)
     {
         printf("Open file failed!\n");
@@ -104,10 +104,10 @@ void cnfParser(void) // 解析cnf文件
     free(pre); //释放空间
     fclose(fp);
 }
-void printRes(bool res, double cost)
+void printRes(bool res, double cost, char *resName)
 {
     FILE *fp;
-    if((fp = fopen("test.res", "w")) == NULL)
+    if((fp = fopen(resName, "w")) == NULL)
     {
         printf("Open file failed!\n");
         exit(1);
@@ -129,7 +129,7 @@ void printRes(bool res, double cost)
         else
             fprintf(fp, "u%d ", i);
     }
-    fprintf(fp, "\nv  %lf ms\n", cost);
+    fprintf(fp, "\nt  %lf ms\n", cost);
 
     fclose(fp);
 }

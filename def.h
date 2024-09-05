@@ -30,7 +30,7 @@ struct LinkHead
 };
 typedef struct LinkHead LinkHead;
 
-void cnfParser(void); // 解析cnf文件
+void cnfParser(char *fileName); // 解析cnf文件
 /*与CNF公式有关的函数*/
 // bool isUnitClause(LinkHead *p); //判断是否为单子句
 // bool isPureClause(LinkHead *p); //判断是否为纯文字子句
@@ -49,6 +49,6 @@ bool isEmpty(LinkHead *Head);
 void addLiteral(LinkHead *Head, int data, LinkNode **pre);
 int chooseData(LinkHead *Head);
 /*输出函数*/
-void printRes(bool res, double cost);
+void printRes(bool res, double cost, char *resName);
 
 #endif
