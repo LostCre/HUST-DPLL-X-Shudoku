@@ -14,8 +14,8 @@ stack s; // 存放每次递归时被赋值的变量的编号
 
 int main(void)
 {
-    char *filename = "Example/unSAT01.cnf";
-    char *resName =  "Example/unSAT01.res";
+    char *filename = "Example/M/SAT-M05.cnf";
+    char *resName =  "Example/M/SAT-M05.res";
     cnfParser(filename); // 读取cnf文件
     initStack(&s, n);
    

@@ -87,6 +87,10 @@ void PureLiteralAssign(LinkHead *Head, LinkNode *p)
         down = down->down;
     }
 }
+void simplifyLiteral(LinkHead *literal)
+{
+    
+}
 LinkHead *literalCopy(LinkHead *Head, int data) // 复制子句
 {
     LinkHead *newHead = (LinkHead *)malloc(sizeof(LinkHead));
@@ -236,30 +240,37 @@ bool isEmpty(LinkHead *Head)
 }
 int chooseData(LinkHead *Head)
 {
-    int data = 0;
+    int *appear = (int *)malloc(sizeof(int) * (n + 1)); //记录每个变元出现的次数
+    memset(appear, 0, sizeof(int) * (n + 1));
+    
+    int max_v = 0; //记录出现次数最多的变元
+    int count = 0; //记录出现次数最多的变元的个数
+
     LinkHead *p = Head->next_head;
     while(p != NULL)
     {
         if(!p->is_simplified)
         {
             LinkNode *q = p->next;
-            bool flag = false;  //标识是否找到未赋值变量
             while(q != NULL)
             {
                 if(var[abs(q->data)] == -1)
                 {
-                    data = q->data;
-                    flag = true;
-                    break;
+                    appear[abs(q->data)]++;
+                    if(appear[abs(q->data)] > count)
+                    {
+                        count = appear[abs(q->data)];
+                        max_v = abs(q->data);
+                    }
                 }
                 q = q->next;
             }
-            if(flag)
-                break;
         }
         p = p->next_head;
     }
-    return data;
+
+    free(appear);
+    return max_v;
 }
 void destoryCNF(LinkHead *head)
 {

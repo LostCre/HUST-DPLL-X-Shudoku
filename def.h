@@ -37,7 +37,7 @@ void cnfParser(char *fileName); // 解析cnf文件
 // bool isContradiction(LinkHead *p); //判断是否为矛盾子句
 bool evaluateClause(LinkHead *p); // 判断子句真值
 void destoryCNF(LinkHead *head);
-
+void simplifyLiteral(LinkHead *literal);
 
 /*DPLL中的执行函数函数*/
 bool DPLL(LinkHead *Head);

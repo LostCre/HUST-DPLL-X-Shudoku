@@ -94,11 +94,13 @@ void cnfParser(char *fileName) // 解析cnf文件
     /*将所有最后出现的变量的down设置为NULL*/
     for (int i = 1; i < n; ++i)
     {
-        pre[i]->down = NULL;
+        if(pre[i] != NULL)
+            pre[i]->down = NULL;
     }
     for(int i = n + 1; i <= 2 * n; ++i)
     {
-        pre[i]->down = NULL;
+        if(pre[i] != NULL)
+            pre[i]->down = NULL;
     }
 
     free(pre); //释放空间
