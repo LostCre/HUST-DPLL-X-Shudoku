@@ -11,7 +11,7 @@ void push(stack *s, int i)
 }
 void pop(stack *s, int *x)
 {
-    x[s->elem[s->top--]] = -1;
+    *x = s->elem[--(s->top)];
 }
 void destroyStack(stack *s)
 {

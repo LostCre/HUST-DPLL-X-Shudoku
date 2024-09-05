@@ -29,7 +29,7 @@ int main(void)
     //     }
     //     printf("\n");
     // }
-    // LinkHead *newHead = literalCopy(Head, 20);
+    // LinkHead *newHead = literalCopy(Head, -20);
     // printf("\nAfter copy\n\n");
     // head = newHead->next_head;
     // for(int i = 1; i <= m + 1; ++i, head = head->next_head)
@@ -43,7 +43,6 @@ int main(void)
     //     }
     //     printf("\n");
     // }
-    // if(DPLL(Head))
     clock_t start, end;
     start = clock();
     bool res = DPLL(Head);
@@ -51,5 +50,7 @@ int main(void)
     double cost = (double)(end - start) / CLOCKS_PER_SEC * 1000;
     printRes(res, cost);
     
+    destroyStack(&s);
+
     return 0;
 }

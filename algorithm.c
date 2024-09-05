@@ -22,14 +22,14 @@ bool UnitPropagate(LinkHead *Head)
 
         if (p->var_num == 1) // 该子句中只有一个变量，是单子句
         {
-            if (var[p->next->data] == -1)
+            if (var[abs(p->next->data)] == -1)
             {
                 var[abs(p->next->data)] = p->next->data < 0 ? 0 : 1; // 将单子句设置为真
                 PureLiteralAssign(Head, p->next);             // 将其他含有该变量的子句进行简化
                 push(&s, abs(p->next->data));
                 return true;
             }
-            else if (var[p->next->data == 1]) // 有可能出现具有相同变量单子句
+            else if (var[abs(p->next->data)] == 1) // 有可能出现具有相同变量单子句
             {
                 p->is_simplified = true;
             }
@@ -46,11 +46,10 @@ bool UnitPropagate(LinkHead *Head)
             LinkNode *last; // 存储上一个未赋值变量
             while (q != NULL)
             {
-                if (var[q->data] == -1)
+                if (var[abs(q->data)] == -1)
                 {
                     count++;
                     last = q;
-                    return true;
                 }
                 if (count > 1) // 多于1个未赋值变量，不是Unit clause
                     break;
@@ -58,8 +57,10 @@ bool UnitPropagate(LinkHead *Head)
             }
             if (count == 1)
             {
-                var[abs(q->data)] = q->data < 0 ? 0 : 1;
-                PureLiteralAssign(Head, q);
+                var[abs(last->data)] = last->data < 0 ? 0 : 1;
+                PureLiteralAssign(Head, last);
+                push(&s, abs(last->data));
+                return true;
             }
         }
 
@@ -134,7 +135,7 @@ LinkHead *literalCopy(LinkHead *Head, int data) // 复制子句
         p = p->next_head;
     }
 
-    for(int i = 1; i <= 2 * n; ++i)
+    for(int i = 0; i <= 2 * n; ++i)
     {
         if(pre[i] != NULL)
         {
@@ -198,26 +199,12 @@ void headCopy(const LinkHead *s, LinkHead *t, LinkNode **pre) // 将s的子句�
     }
     q->next = NULL;
 }
-bool isEmpty(LinkHead *Head)
-{
-    if(Head->next_head == NULL)
-        return true;
-    bool flag = true;
-    LinkHead *p = Head->next_head;
-    while(flag && p != NULL)
-    {
-        if(!p->is_simplified)
-            flag = false;
-
-        p = p->next_head;
-    }
-}
 void addLiteral(LinkHead *Head, int data, LinkNode **pre)
 {
     /*newLiteral的head信息填入*/
     LinkHead *newLiteral = (LinkHead *)malloc(sizeof(LinkHead));
     newLiteral->is_simplified = false;
-    newLiteral->var_num = 1919810;
+    newLiteral->var_num = 1;
 
     /*newLiteral的node信息初始化*/
     newLiteral->next = (LinkNode *)malloc(sizeof(LinkNode));
@@ -232,9 +219,24 @@ void addLiteral(LinkHead *Head, int data, LinkNode **pre)
     Head->next_head = newLiteral;
     newLiteral->next_head = NULL;
 }
+bool isEmpty(LinkHead *Head)
+{
+    if(Head->next_head == NULL)
+        return true;
+    bool flag = true;
+    LinkHead *p = Head->next_head;
+    while(flag && p != NULL)
+    {
+        if(!p->is_simplified)
+            flag = false;
+
+        p = p->next_head;
+    }
+    return flag;
+}
 int chooseData(LinkHead *Head)
 {
-    int data;
+    int data = 0;
     LinkHead *p = Head->next_head;
     while(p != NULL)
     {
@@ -250,6 +252,7 @@ int chooseData(LinkHead *Head)
                     flag = true;
                     break;
                 }
+                q = q->next;
             }
             if(flag)
                 break;
@@ -298,6 +301,17 @@ bool DPLL(LinkHead *Head)
         return true;
 
     int data = chooseData(Head);
+    if(data == 0) //说明已经没有可以赋值的变量，但同时不为空，说明不满足，应回溯
+    {
+        for(int i = 1; i <= count; ++i)
+        {
+            int x;
+            pop(&s, &x);
+            var[x] = -1;
+        }
+        return false;
+    }
+
     LinkHead *newHead = literalCopy(Head, data);
     if(DPLL(newHead))
     {

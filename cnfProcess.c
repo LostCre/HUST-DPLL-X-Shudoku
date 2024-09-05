@@ -124,10 +124,12 @@ void printRes(bool res, double cost)
     {
         if(var[i] == 1)
             fprintf(fp, "%d ", i);
+        else if(var[i] == 0)
+            fprintf(fp, "%d ", -1 * i);
         else
-            fprintf(fp, "%d ", var[i] * i);
+            fprintf(fp, "u%d ", i);
     }
-    fprintf(fp, "v  %lf ms\n", cost);
+    fprintf(fp, "\nv  %lf ms\n", cost);
 
     fclose(fp);
 }
