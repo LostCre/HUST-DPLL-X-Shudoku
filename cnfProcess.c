@@ -58,7 +58,7 @@ void cnfParser(char *fileName) // 解析cnf文件
             current->data = x;
             current->head = p;
 
-            if (pre[abs(x)] != NULL) // 之前x(带符号)已经出现过
+            if (pre[abs(x)] != NULL) // 之前 |x| 变元已经出现过
             {
                 pre[abs(x)]->down = current;
                 current->up = pre[abs(x)];
@@ -66,6 +66,8 @@ void cnfParser(char *fileName) // 解析cnf文件
             else
                 current->up = NULL;
             pre[abs(x)] = current; // 存储x的第一个位置
+
+            current->next = NULL;
         }
         else
             continue;
@@ -87,6 +89,8 @@ void cnfParser(char *fileName) // 解析cnf文件
                 pre[abs(x)]->down = current;
                 current->up = pre[abs(x)];
             }
+            else
+                current->up = NULL;
             pre[abs(x)] = current; // 存储x的第一个位置
 
             fscanf(fp, " %d", &x);

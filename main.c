@@ -10,12 +10,24 @@ stack s; // 存放每次递归时被赋值的变量的编号
 
 int main(void)
 {
-    char *filename = "Example/SAT-baseline.cnf";
-    char *resName =  "Example/SAT-baseline.res";
+    char *filename = "Example/M/SAT-M03.cnf";
+    char *resName =  "Example/M/SAT-M03.res";
 
     cnfParser(filename); // 读取cnf文件
     initStack(&s, n);
-   
+    // printf("n = %d, m = %d\n", n, m);
+    // LinkHead *head = Head->next_head;
+    // for(int i = 1; i <= m; ++i, head = head->next_head)
+    // {
+    //     printf("No.%d :  ", i);
+    //     LinkNode *p = head->next;
+    //     while(p != NULL)
+    //     {
+    //         printf("%d ", p->data);
+    //         p = p->next;
+    //     }
+    //     printf("\n");
+    // }
     clock_t start, end;
     start = clock();
     bool res = DPLL(Head);
