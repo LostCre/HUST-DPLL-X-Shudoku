@@ -8,14 +8,11 @@ LinkHead *Head;
 int *var;  //各个布尔变元的真值情况
 stack s; // 存放每次递归时被赋值的变量的编号
 
-/*
-* 使用带头结点的十字链表对子句进行存储
-*/
-
 int main(void)
 {
-    char *filename = "Example/M/SAT-M05.cnf";
-    char *resName =  "Example/M/SAT-M05.res";
+    char *filename = "Example/SAT-baseline.cnf";
+    char *resName =  "Example/SAT-baseline.res";
+
     cnfParser(filename); // 读取cnf文件
     initStack(&s, n);
    
@@ -26,6 +23,8 @@ int main(void)
     double cost = (double)(end - start) / CLOCKS_PER_SEC * 1000;
     printRes(res, cost, resName);
     
+    printf("Finish\n");
+    destoryCNF(Head);
     destroyStack(&s);
 
     return 0;

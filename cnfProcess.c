@@ -3,6 +3,7 @@
 extern int n, m;       // n为文字数量，m为子句数量
 extern int *var;       // 各个布尔变元的真值情况
 extern LinkHead *Head; // 存储子句的链表
+int *appear;           // 记录每个变元出现的次数
 
 void cnfParser(char *fileName) // 解析cnf文件
 {
@@ -26,9 +27,12 @@ void cnfParser(char *fileName) // 解析cnf文件
     var = (int *)malloc(sizeof(int) * (n + 1)); // 为变元真值分配空间
     memset(var, -1, sizeof(int) * (n + 1));
 
-    LinkNode **pre = (LinkNode **)malloc(sizeof(LinkNode *) * (2 * n + 1)); // 存储每个变元上一次出现的位置
-    for (int i = 0; i <= 2 * n; ++i)
+    LinkNode **pre = (LinkNode **)malloc(sizeof(LinkNode *) * (n + 1)); // 存储每个变元上一次出现的位置
+    for (int i = 0; i <= n; ++i)
         pre[i] = NULL; // 初始化为NULL
+
+    appear = (int *)malloc(sizeof(int) * (n + 1)); // 记录每个变元出现的次数
+    memset(appear, 0, sizeof(int) * (n + 1));
 
     /*开始读入子句*/
     LinkHead *p;
@@ -46,6 +50,7 @@ void cnfParser(char *fileName) // 解析cnf文件
         LinkNode *current;
         if (x != 0)
         {
+            appear[abs(x)]++;
             p->var_num++;
             p->next = (LinkNode *)malloc(sizeof(LinkNode));
 
@@ -53,14 +58,14 @@ void cnfParser(char *fileName) // 解析cnf文件
             current->data = x;
             current->head = p;
 
-            if (pre[x + n] != NULL) // 之前x(带符号)已经出现过
+            if (pre[abs(x)] != NULL) // 之前x(带符号)已经出现过
             {
-                pre[x + n]->down = current;
-                current->up = pre[x + n];
+                pre[abs(x)]->down = current;
+                current->up = pre[abs(x)];
             }
             else
                 current->up = NULL;
-            pre[x + n] = current; // 存储x的第一个位置
+            pre[abs(x)] = current; // 存储x的第一个位置
         }
         else
             continue;
@@ -68,6 +73,7 @@ void cnfParser(char *fileName) // 解析cnf文件
         fscanf(fp, " %d", &x);
         while (x != 0)
         {
+            appear[abs(x)] += 1;
             p->var_num++;
             current->next = (LinkNode *)malloc(sizeof(LinkNode));
             current = current->next;
@@ -76,57 +82,53 @@ void cnfParser(char *fileName) // 解析cnf文件
             current->next = NULL;
             current->head = p;
 
-            if (pre[x + n] != NULL) // 之前x(带符号)已经出现过
+            if (pre[abs(x)] != NULL) // 之前x(带符号)已经出现过
             {
-                pre[x + n]->down = current;
-                current->up = pre[x + n];
+                pre[abs(x)]->down = current;
+                current->up = pre[abs(x)];
             }
-            pre[x + n] = current; // 存储x的第一个位置
+            pre[abs(x)] = current; // 存储x的第一个位置
 
             fscanf(fp, " %d", &x);
         }
 
-        if(i != m)
+        if (i != m)
             p->next_head = (LinkHead *)malloc(sizeof(LinkHead));
         else
             p->next_head = NULL;
     }
     /*将所有最后出现的变量的down设置为NULL*/
-    for (int i = 1; i < n; ++i)
+    for (int i = 1; i <= n; ++i)
     {
-        if(pre[i] != NULL)
-            pre[i]->down = NULL;
-    }
-    for(int i = n + 1; i <= 2 * n; ++i)
-    {
-        if(pre[i] != NULL)
+        if (pre[i] != NULL) // 可能有的变元没有出现
             pre[i]->down = NULL;
     }
 
-    free(pre); //释放空间
+    free(pre); // 释放空间
+
     fclose(fp);
 }
 void printRes(bool res, double cost, char *resName)
 {
     FILE *fp;
-    if((fp = fopen(resName, "w")) == NULL)
+    if ((fp = fopen(resName, "w")) == NULL)
     {
         printf("Open file failed!\n");
         exit(1);
     }
-    
+
     fprintf(fp, "s  ");
-    if(res)
+    if (res)
         fprintf(fp, "1\n");
     else
         fprintf(fp, "0\n");
 
     fprintf(fp, "v  ");
-    for(int i = 1; i <= n; ++i)
+    for (int i = 1; i <= n; ++i)
     {
-        if(var[i] == 1)
+        if (var[i] == 1)
             fprintf(fp, "%d ", i);
-        else if(var[i] == 0)
+        else if (var[i] == 0)
             fprintf(fp, "%d ", -1 * i);
         else
             fprintf(fp, "u%d ", i);

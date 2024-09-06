@@ -32,12 +32,10 @@ typedef struct LinkHead LinkHead;
 
 void cnfParser(char *fileName); // 解析cnf文件
 /*与CNF公式有关的函数*/
-// bool isUnitClause(LinkHead *p); //判断是否为单子句
-// bool isPureClause(LinkHead *p); //判断是否为纯文字子句
-// bool isContradiction(LinkHead *p); //判断是否为矛盾子句
-bool evaluateClause(LinkHead *p); // 判断子句真值
 void destoryCNF(LinkHead *head);
 void simplifyLiteral(LinkHead *literal);
+void verticalProcess(LinkNode *p);
+void deleteNode(LinkNode *p);
 
 /*DPLL中的执行函数函数*/
 bool DPLL(LinkHead *Head);
