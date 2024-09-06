@@ -27,10 +27,6 @@ void cnfParser(char *fileName) // 解析cnf文件
     var = (int *)malloc(sizeof(int) * (n + 1)); // 为变元真值分配空间
     memset(var, -1, sizeof(int) * (n + 1));
 
-    LinkNode **pre = (LinkNode **)malloc(sizeof(LinkNode *) * (n + 1)); // 存储每个变元上一次出现的位置
-    for (int i = 0; i <= n; ++i)
-        pre[i] = NULL; // 初始化为NULL
-
     appear = (int *)malloc(sizeof(int) * (n + 1)); // 记录每个变元出现的次数
     memset(appear, 0, sizeof(int) * (n + 1));
 
@@ -58,15 +54,6 @@ void cnfParser(char *fileName) // 解析cnf文件
             current->data = x;
             current->head = p;
 
-            if (pre[abs(x)] != NULL) // 之前 |x| 变元已经出现过
-            {
-                pre[abs(x)]->down = current;
-                current->up = pre[abs(x)];
-            }
-            else
-                current->up = NULL;
-            pre[abs(x)] = current; // 存储x的第一个位置
-
             current->next = NULL;
         }
         else
@@ -84,15 +71,6 @@ void cnfParser(char *fileName) // 解析cnf文件
             current->next = NULL;
             current->head = p;
 
-            if (pre[abs(x)] != NULL) // 之前x(带符号)已经出现过
-            {
-                pre[abs(x)]->down = current;
-                current->up = pre[abs(x)];
-            }
-            else
-                current->up = NULL;
-            pre[abs(x)] = current; // 存储x的第一个位置
-
             fscanf(fp, " %d", &x);
         }
 
@@ -101,14 +79,6 @@ void cnfParser(char *fileName) // 解析cnf文件
         else
             p->next_head = NULL;
     }
-    /*将所有最后出现的变量的down设置为NULL*/
-    for (int i = 1; i <= n; ++i)
-    {
-        if (pre[i] != NULL) // 可能有的变元没有出现
-            pre[i]->down = NULL;
-    }
-
-    free(pre); // 释放空间
 
     fclose(fp);
 }

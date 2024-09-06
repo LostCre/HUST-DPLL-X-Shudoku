@@ -8,6 +8,7 @@ extern int n, m;
 extern int *var;
 bool findContradiction;
 extern stack s;
+extern int *appear;
 
 bool UnitPropagate(LinkHead *Head)
 {
@@ -29,7 +30,11 @@ bool UnitPropagate(LinkHead *Head)
                 PureLiteralAssign(Head, p->next); // 将其他含有该变量的子句进行简化
                 return true;
             }
-            else if (var[abs(p->next->data)] == 1) // 有可能出现具有相同变量单子句
+            else if (var[abs(p->next->data)] == 1 && p->next->data > 0) // 有可能出现具有相同变量单子句
+            {
+                p->is_simplified = true;
+            }
+            else if(var[abs(p->next->data)] == 0 && p->next->data < 0)
             {
                 p->is_simplified = true;
             }
@@ -76,61 +81,32 @@ void PureLiteralAssign(LinkHead *Head, LinkNode *p)
 
     /*先打上is_simplified标记*/
     p->head->is_simplified = true;
-    /*向上查找所有含有 p 节点的子句*/
-    LinkNode *up = p->up;
-    while (up != NULL)
+
+    LinkHead *head = Head->next_head;
+    while(head != NULL)
     {
-        if (up->data == data)
+        LinkNode *q = head->next;
+        while(q != NULL)
         {
-            up->head->is_simplified = true;
-            up = up->up;
+            if(q->data == data)
+            {
+                head->is_simplified = true;
+                break;
+            }
+            else if(q->data == -data)
+            {
+                LinkNode *temp = q;
+                q = q->next;
+                deleteNode(temp);
+            }
+            else
+                q = q->next;
         }
-        else
-        {
-            LinkNode *temp = up;
-            up = up->up;
-            deleteNode(temp);
-        }
+        head = head->next_head;
     }
-    /*向下查找所有含有 p 节点的子句*/
-    LinkNode *down = p->down;
-    while (down != NULL)
-    {
-        if (down->data == data)
-        {
-            down->head->is_simplified = true;
-            down = down->down;
-        }
-        else
-        {
-            LinkNode *temp = down;
-            down = down->down;
-            deleteNode(temp);
-        }
-    }
+
     /*统一删除所有带is_simplified标记的子句*/
     simplifyLiteral(Head);
-}
-void verticalProcess(LinkNode *p)
-{
-    /*先纵向处理up和down指针域*/
-    LinkNode *up = p->up;
-    LinkNode *down = p->down;
-    if (up == NULL && down == NULL) // 说明p是唯一一个变元
-    {
-       return;
-    }
-    else if (up != NULL && down != NULL)
-    {
-        up->down = down;
-        down->up = up;
-    }
-    else if (up == NULL) // 是纵向的第一个变元
-        down->up = NULL;
-
-    else // 是纵向的最后一个变元
-        up->down = NULL;
-
 }
 void deleteNode(LinkNode *p)
 {
@@ -141,8 +117,8 @@ void deleteNode(LinkNode *p)
         return;
     }
 
-    verticalProcess(p);  // 纵向处理
-    /*开始横向处理*/
+    appear[abs(p->data)]--; // 被删除的变元出现次数减一
+    
     LinkHead *head = p->head;
     LinkNode *q = head->next;
     if (q == p) // 说明p是第一个变元
@@ -175,8 +151,8 @@ void simplifyLiteral(LinkHead *Head)
             while (q != NULL)
             {
                 LinkNode *temp = q;
+                appear[abs(q->data)]--; // 被删除的变元出现次数减一
                 q = q->next;
-                verticalProcess(temp);
                 free(temp);
             }
             free(p);
@@ -194,12 +170,7 @@ LinkHead *literalCopy(LinkHead *Head, int data) // 复制子句
     LinkHead *newHead = (LinkHead *)malloc(sizeof(LinkHead));
     newHead->next_head = NULL;
 
-    /*初始化pre*/
-    LinkNode **pre = (LinkNode **)malloc(sizeof(LinkNode *) * (n + 1)); // 存储每个变元上一次出现的位置
-    for (int i = 0; i <= n; ++i)
-        pre[i] = NULL; // 初始化为NULL
-
-    addLiteral(newHead, data, pre);
+    addLiteral(newHead, data);
     LinkHead *temp = newHead;
     newHead = newHead->next_head;
 
@@ -212,7 +183,7 @@ LinkHead *literalCopy(LinkHead *Head, int data) // 复制子句
     if (p != NULL) // 说明存在未被简化的子句
     {
         newHead->next_head = (LinkHead *)malloc(sizeof(LinkHead));
-        headCopy(p, newHead, pre); // 将head进行copy到newHead的next_head
+        headCopy(p, newHead); // 将head进行copy到newHead的next_head
         p = p->next_head;
     }
     else // 说明不存在被简化的子句，未空子句
@@ -232,23 +203,15 @@ LinkHead *literalCopy(LinkHead *Head, int data) // 复制子句
             p = p->next_head;
             continue;
         }
-        headCopy(p, new_p, pre);
+        headCopy(p, new_p);
         new_p = new_p->next_head;
         p = p->next_head;
     }
 
-    for (int i = 0; i <= n; ++i)
-    {
-        if (pre[i] != NULL) // 可能有的变元没有出现
-            pre[i]->down = NULL;
-    }
-
-    free(pre);
-
     new_p->next_head = NULL;
     return temp;
 }
-void headCopy(const LinkHead *s, LinkHead *t, LinkNode **pre) // 将s的子句复制到t的next_head
+void headCopy(const LinkHead *s, LinkHead *t) // 将s的子句复制到t的next_head
 {
     t->next_head = (LinkHead *)malloc(sizeof(LinkHead));
     t = t->next_head;
@@ -264,15 +227,6 @@ void headCopy(const LinkHead *s, LinkHead *t, LinkNode **pre) // 将s的子句�
         t->next->data = p->data;
         t->next->head = t;
 
-        if (pre[abs(p->data)] != NULL) // 之前x(带符号)已经出现过
-        {
-            pre[abs(p->data)]->down = t->next;
-            t->next->up = pre[abs(p->data)];
-        }
-        else
-            t->next->up = NULL;
-        pre[abs(p->data)] = t->next; // 更新pre
-
         p = p->next; // 移动到原子句的下一个变元
     }
 
@@ -285,21 +239,11 @@ void headCopy(const LinkHead *s, LinkHead *t, LinkNode **pre) // 将s的子句�
         q->data = p->data;
         q->head = t;
 
-        if (pre[abs(q->data)] != NULL) // 之前x(带符号)已经出现过
-        {
-            pre[abs(q->data)]->down = q;
-            q->up = pre[abs(q->data)];
-        }
-        else
-            q->up = NULL;
-
-        pre[abs(q->data)] = q; // 更新pre
-
         p = p->next; // 移动到原子句的下一个变元
     }
     q->next = NULL;
 }
-void addLiteral(LinkHead *Head, int data, LinkNode **pre)
+void addLiteral(LinkHead *Head, int data)
 {
     /*newLiteral的head信息填入*/
     LinkHead *newLiteral = (LinkHead *)malloc(sizeof(LinkHead));
@@ -309,11 +253,8 @@ void addLiteral(LinkHead *Head, int data, LinkNode **pre)
     /*newLiteral的node信息初始化*/
     newLiteral->next = (LinkNode *)malloc(sizeof(LinkNode));
     newLiteral->next->data = data;
-    newLiteral->next->up = NULL;
     newLiteral->next->head = newLiteral;
-    newLiteral->next->down = NULL;
     newLiteral->next->next = NULL;
-    pre[abs(data)] = newLiteral->next;
 
     /*将新句子接到句首*/
     Head->next_head = newLiteral;
@@ -338,28 +279,16 @@ int chooseData(LinkHead *Head) // 选择一个出现次数最多的变量进行�
 {
     int max_count = 0;
     int max_v = 0;
-    int *appear = (int *)malloc(sizeof(int) * (n + 1));
-    memset(appear, 0, sizeof(int) * (n + 1));
 
-    /*开始遍历*/
-    LinkHead *p = Head->next_head;
-    while (p != NULL)
+    for(int i = 1; i <= n; ++i)
     {
-        LinkNode *q = p->next; // q 用于遍历子句的每个变元
-        while (q != NULL)
+        if(var[i] == -1 && appear[i] > max_count)
         {
-            appear[abs(q->data)]++;
-            if (var[abs(q->data)] == -1 && appear[abs(q->data)] > max_count)
-            {
-                max_count = appear[abs(q->data)];
-                max_v = q->data;
-            }
-            q = q->next;
+            max_count = appear[i];
+            max_v = i;
         }
-        p = p->next_head;
     }
 
-    free(appear);
     return max_v;
 }
 void destoryCNF(LinkHead *head)
@@ -412,6 +341,7 @@ bool DPLL(LinkHead *Head)
         }
         return false;
     }
+    appear[data]++;
 
     LinkHead *newHead = literalCopy(Head, data);
     if (DPLL(newHead))

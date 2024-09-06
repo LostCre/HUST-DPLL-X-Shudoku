@@ -15,8 +15,6 @@ struct LinkNode
 {
     int data;    // 变元的编号
     struct LinkNode *next;
-    struct LinkNode *down; // 指向下一个相同变元
-    struct LinkNode *up;   // 指向上一个相同变元
     struct LinkHead *head;
 }; // 以带头节点的链表作为子句，头节点可以表示其是否为空子句以及其变元个数
 typedef struct LinkNode LinkNode;
@@ -34,7 +32,6 @@ void cnfParser(char *fileName); // 解析cnf文件
 /*与CNF公式有关的函数*/
 void destoryCNF(LinkHead *head);
 void simplifyLiteral(LinkHead *literal);
-void verticalProcess(LinkNode *p);
 void deleteNode(LinkNode *p);
 
 /*DPLL中的执行函数函数*/
@@ -42,9 +39,9 @@ bool DPLL(LinkHead *Head);
 bool UnitPropagate(LinkHead *Head);
 void PureLiteralAssign(LinkHead *Head, LinkNode *p);
 LinkHead *literalCopy(LinkHead *Head, int data);
-void headCopy(const LinkHead *s, LinkHead *t, LinkNode **pre);
+void headCopy(const LinkHead *s, LinkHead *t);
 bool isEmpty(LinkHead *Head);
-void addLiteral(LinkHead *Head, int data, LinkNode **pre);
+void addLiteral(LinkHead *Head, int data);
 int chooseData(LinkHead *Head);
 /*输出函数*/
 void printRes(bool res, double cost, char *resName);
