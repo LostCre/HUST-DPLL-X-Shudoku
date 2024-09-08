@@ -334,6 +334,19 @@ bool isEmpty(LinkHead *Head)
     }
     return flag;
 }
+int VSIDS(LinkHead *Head)
+{
+    static double *score = NULL;
+    static double learning_decay = 0.95;
+    if(score == NULL)
+    {
+        score = (double *)malloc(sizeof(double) * (n + 1));
+        memset(score, 0, sizeof(double) * (n + 1));
+    }
+
+    LinkHead *p = Head->next_head;
+    
+}
 int chooseData(LinkHead *Head) // 选择一个出现次数最多的变量进行赋值
 {
     int max_count = 0;

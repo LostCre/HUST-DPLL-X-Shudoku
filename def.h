@@ -46,6 +46,10 @@ void headCopy(const LinkHead *s, LinkHead *t, LinkNode **pre);
 bool isEmpty(LinkHead *Head);
 void addLiteral(LinkHead *Head, int data, LinkNode **pre);
 int chooseData(LinkHead *Head);
+
+/*Branching Rules*/
+int VSIDS(LinkHead *Head);
+
 /*输出函数*/
 void printRes(bool res, double cost, char *resName);
 
