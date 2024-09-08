@@ -1,6 +1,6 @@
 /*本文档用于存储与栈相关的函数定义*/
-#ifndef _STACK_H
-#define _STACK_H
+#ifndef __STACK_H__
+#define __STACK_H__
 
 #include <stdlib.h>
 struct stack

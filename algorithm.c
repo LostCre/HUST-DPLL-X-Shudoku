@@ -1,13 +1,10 @@
 #include "def.h"
 #include "stack.h"
-/*
-本文档用于存放DPLL算法和其他数据结构相关的代码:
-如UnitPropagate, DPLL, PureLiteralAssign, etc.
-*/
+
 extern int n, m;
 extern int *var;
-bool findContradiction;
 extern stack s;
+bool isContradiction;
 
 bool UnitPropagate(LinkHead *Head)
 {
@@ -28,15 +25,6 @@ bool UnitPropagate(LinkHead *Head)
                 push(&s, abs(p->next->data));
                 PureLiteralAssign(Head, p->next); // 将其他含有该变量的子句进行简化
                 return true;
-            }
-            else if (var[abs(p->next->data)] == 1) // 有可能出现具有相同变量单子句
-            {
-                p->is_simplified = true;
-            }
-            else
-            {
-                findContradiction = true; // 出现假单子句、发生矛盾
-                return false;             // 结束查找Unit Clause
             }
         }
         else
@@ -118,7 +106,7 @@ void verticalProcess(LinkNode *p)
     LinkNode *down = p->down;
     if (up == NULL && down == NULL) // 说明p是唯一一个变元
     {
-       return;
+        return;
     }
     else if (up != NULL && down != NULL)
     {
@@ -130,18 +118,17 @@ void verticalProcess(LinkNode *p)
 
     else // 是纵向的最后一个变元
         up->down = NULL;
-
 }
 void deleteNode(LinkNode *p)
 {
     /*逻辑判断——若删除后子句为空，则说明为假*/
     if (p->head->var_num == 1)
     {
-        findContradiction = true;
+        isContradiction = true;
         return;
     }
 
-    verticalProcess(p);  // 纵向处理
+    verticalProcess(p); // 纵向处理
     /*开始横向处理*/
     LinkHead *head = p->head;
     LinkNode *q = head->next;
@@ -380,14 +367,41 @@ void destoryCNF(LinkHead *head)
     }
     free(head);
 }
+bool evaluateClause(LinkHead *p)
+{
+    LinkNode *q = p->next;
+    while (q != NULL)
+    {
+        if (var[abs(q->data)] == -1)    // 说明该变量未被赋值->不确定，默认为true
+            return true;
+        else if (q->data > 0 && var[abs(q->data)] == 1)
+            return true;
+        else if (q->data < 0 && var[abs(q->data)] == 0)
+            return true;
+        q = q->next;
+    }
+    return false;
+}
+bool findContradiction(LinkHead *Head)
+{
+    LinkHead *p = Head->next_head;
+    while (p != NULL)
+    {
+        if (!p->is_simplified && !evaluateClause(p))
+            return true;
+        p = p->next_head;
+    }
+    return false;
+}
 bool DPLL(LinkHead *Head)
 {
     int count = 0;
-    findContradiction = false;
+    isContradiction = false;
 
     while (UnitPropagate(Head))
         count++; // 查找单子句，并化简
-    if (findContradiction)
+
+    if (isContradiction || findContradiction(Head))
     {
         for (int i = 1; i <= count; ++i)
         {
