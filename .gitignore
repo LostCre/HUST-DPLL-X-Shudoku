@@ -2,3 +2,5 @@
 Doc/
 Answer/
 .json
+.o
+.exe
