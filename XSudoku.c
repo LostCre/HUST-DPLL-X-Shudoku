@@ -71,13 +71,13 @@ int randInt(const Position pos, int **board) // 生成随机数
 
     return k;
 }
-bool generateDianoga(int x, int y, int **board) // 生成 '/' 对角线的数字
+bool generateDiagonal(int x, int y, int **board) // 生成 '/' 对角线的数字
 {
     /*结束条件*/
     if (x > 9)
         return true;
     else if (x == y)
-        return generateDianoga(x + 1, y - 1, board);
+        return generateDiagonal(x + 1, y - 1, board);
 
     Position pos = {x, y};
     int count = 0;
@@ -106,7 +106,57 @@ bool generateDianoga(int x, int y, int **board) // 生成 '/' 对角线的数字
             k = rand() % count + 1;
 
         board[x][y] = valid_val[k];
-        flag = generateDianoga(x + 1, y - 1, board);
+        flag = generateDiagonal(x + 1, y - 1, board);
+        if (!flag)
+            board[x][y] = valid_val[k] = 0; // 重置回原来的数字，并删除该数字
+    }
+
+    return flag;
+}
+bool generateByRow(int x, int y, int **board)
+{
+    /*结束条件*/
+    if (x == 9 && y == 9) // 已经全部初始化完
+        return true;
+    else if (x == y || x == 10 - y) // 更新到对角线
+    {
+        if (y < 9) // 本行还未更新完
+            return generateByRow(x, y + 1, board);
+        else // 本行已经更新完，更新下一行
+            return generateByRow(x + 1, 1, board);
+    }
+    Position pos = {x, y};
+    int count = 0;
+    int valid_val[10] = {0};
+    for (int i = 1; i <= 9; ++i) // 得到所有可用数字
+    {
+        if (isValid(pos, i, board))
+        {
+            count++;
+            valid_val[count] = i;
+        }
+    }
+
+    bool flag = false; // 是否满足条件
+    while (!flag)
+    {
+        bool isNoSolution = true;
+        for (int i = 1; i <= count && isNoSolution == true; ++i) // 查找是否还存在可用数字
+            isNoSolution = !(valid_val[i] != 0);
+
+        if (isNoSolution) // 说明已经把所有数字都试过了，进行回溯
+            return false;
+
+        int k = 0;
+        while (valid_val[k] == 0) // 随机挑选数字
+            k = rand() % count + 1;
+
+        board[x][y] = valid_val[k];
+
+        if (y != 9) // 本行尚未生成结束
+            flag = generateByRow(x, y + 1, board);
+        else        // 本行已经生成结束，跳转到下一行
+            flag = generateByRow(x + 1, 1, board);
         if (!flag)
             board[x][y] = valid_val[k] = 0; // 重置回原来的数字，并删除该数字
     }
@@ -130,7 +180,7 @@ int **generateXSudoku(void) // 总控函数
         Position pos = {i, i};
         board[i][i] = randInt(pos, board);
     }
-    generateDianoga(1, 9, board); // 接着去生成另一条对角线
+    generateDiagonal(1, 9, board); // 接着去生成另一条对角线
     generateByRow(1, 2, board);
 
     // showSudoku(board);
