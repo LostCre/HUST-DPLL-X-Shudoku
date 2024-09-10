@@ -31,7 +31,7 @@ struct LinkHead
 typedef struct LinkHead LinkHead;
 
 /*与CNF公式有关的函数*/
-void cnfParser(char *fileName);          // 解析cnf文件
+void cnfParser(const char *fileName);          // 解析cnf文件
 void destoryCNF(LinkHead *head);         // 销毁CNF
 void simplifyLiteral(LinkHead *literal); // 删除简化
 void verticalProcess(LinkNode *p);       // 纵向处理(主要处理节点的up和down指针域)
@@ -50,6 +50,6 @@ int chooseData(LinkHead *Head);                                // 选择一个�
 bool findContradiction(LinkHead *Head);                        // 查找当前是否存在矛盾子句
 
 /*输出函数*/
-void printRes(bool res, double cost, char *resName);
+void printRes(bool res, double cost, const char *resName);
 
 #endif

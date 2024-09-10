@@ -1,5 +1,5 @@
 # HUST-DPLL SAT_Solver & Sudoku
-文件结构
+文件结构(DPLL & SAT部分)
 ```
 main.c:文件的主函数
 
@@ -23,6 +23,18 @@ algorighm.c:
             literalCopy: 复制全部公式
             addLiteral: 添加文字
         destoryCNF: 销毁公式
+```
+
+X数独生成思想：
+* 先生成终盘数独:
+  * 先对两个对角线部分的数字进行计算
+  * 然后再对每个对角线上的block进行随机生成
+  * 之后再按正常步骤生成
+* 挖洞法生成数独:
+  * 
+XSudoku部分:
+```
+
 ```
 
 如何使用:

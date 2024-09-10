@@ -5,7 +5,7 @@ extern int *var;       // 各个布尔变元的真值情况
 extern LinkHead *Head; // 存储子句的链表
 int *appear;           // 记录每个变元出现的次数
 
-void cnfParser(char *fileName) // 解析cnf文件
+void cnfParser(const char *fileName) // 解析cnf文件
 {
     /*打开文件*/
     FILE *fp = fopen(fileName, "r");
@@ -112,7 +112,7 @@ void cnfParser(char *fileName) // 解析cnf文件
 
     fclose(fp);
 }
-void printRes(bool res, double cost, char *resName)
+void printRes(bool res, double cost, const char *resName)
 {
     FILE *fp;
     if ((fp = fopen(resName, "w")) == NULL)

@@ -1,4 +1,4 @@
-object = stack.o cnfProcess.o \
+object = stack.o cnfProcess.o Xsudoku.o \
 		algorithm.o  main.o 
 
 SAT_Solver: ${object}
@@ -15,6 +15,9 @@ cnfProcess.o: cnfProcess.c def.h
 
 stack.o: stack.c stack.h
 	gcc -g -c stack.c
+
+Xsudoku.o: Xsudoku.c def.h Xsudoku.h
+	gcc -g -c Xsudoku.c
 
 .PHONY: clean
 clean:
