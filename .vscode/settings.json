@@ -8,6 +8,7 @@
         "math.h": "c",
         "string.h": "c",
         "stack.h": "c",
-        "numbers": "c"
+        "numbers": "c",
+        "xsudoku.h": "c"
     }
 }
