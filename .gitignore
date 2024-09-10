@@ -3,5 +3,5 @@ Doc/
 Answer/
 *.json
 *.o
-*.exe
+SAT_Solver.exe
 *.cnf
