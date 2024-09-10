@@ -31,12 +31,12 @@ struct LinkHead
 typedef struct LinkHead LinkHead;
 
 /*与CNF公式有关的函数*/
-void cnfParser(const char *fileName);          // 解析cnf文件
-void destoryCNF(LinkHead *head);         // 销毁CNF
-void simplifyLiteral(LinkHead *literal); // 删除简化
-void verticalProcess(LinkNode *p);       // 纵向处理(主要处理节点的up和down指针域)
-void deleteNode(LinkNode *p);            // 删除节点
-bool evaluateClause(LinkHead *p);        // 判断子句是否为真
+LinkHead *cnfParser(const char *fileName); // 解析cnf文件
+void destoryCNF(LinkHead *head);           // 销毁CNF
+void simplifyLiteral(LinkHead *literal);   // 删除简化
+void verticalProcess(LinkNode *p);         // 纵向处理(主要处理节点的up和down指针域)
+void deleteNode(LinkNode *p);              // 删除节点
+bool evaluateClause(LinkHead *p);          // 判断子句是否为真
 
 /*DPLL中的执行函数函数*/
 bool DPLL(LinkHead *Head);                                     // DPLL算法

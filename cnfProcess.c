@@ -2,11 +2,11 @@
 
 extern int n, m;       // n为文字数量，m为子句数量
 extern int *var;       // 各个布尔变元的真值情况
-extern LinkHead *Head; // 存储子句的链表
 int *appear;           // 记录每个变元出现的次数
 
-void cnfParser(const char *fileName) // 解析cnf文件
+LinkHead *cnfParser(const char *fileName) // 解析cnf文件
 {
+    LinkHead *Head;
     /*打开文件*/
     FILE *fp = fopen(fileName, "r");
     if (fp == NULL)
@@ -111,6 +111,8 @@ void cnfParser(const char *fileName) // 解析cnf文件
     free(pre); // 释放空间
 
     fclose(fp);
+
+    return Head;
 }
 void printRes(bool res, double cost, const char *resName)
 {
