@@ -1,6 +1,5 @@
 #include "XSudoku.h"
 #include "def.h"
-#include "stack.h"
 
 /*生成数独->使用Las-Vegas算法生成*/
 bool isValid(const Position pos, const int val, const int **board) // 判断当前变量放置方式是否合法
@@ -240,7 +239,7 @@ void SudokuToCNF(const int **board)
         }
     }
     int n = 999;
-    int m = 6135 + count;
+    int m = 9738 + count;
     fprintf(fp, "p cnf %d %d\n", n, m);
     /*先输出非0元素*/
     for (int i = 1; i <= count; ++i)
@@ -259,13 +258,9 @@ void SudokuToCNF(const int **board)
     /*每个格子最多只有一个数字*/
     for (int i = 1; i <= 9; ++i)
         for (int j = 1; j <= 9; ++j)
-            for (int k = 1; k <= 9; ++k)
-                for (int x = 1; x <= 9; ++x)
-                {
-                    if (x == k)
-                        continue;
+            for (int k = 1; k <= 8; ++k)
+                for (int x = k + 1; x <= 9; ++x)
                     fprintf(fp, "-%d%d%d -%d%d%d 0\n", i, j, k, i, j, x);
-                }
 
     /*每行有全部的数字*/
     for (int i = 1; i <= 9; ++i)
@@ -275,7 +270,12 @@ void SudokuToCNF(const int **board)
                 fprintf(fp, "%d%d%d ", i, j, k);
             fprintf(fp, "0\n");
         }
-
+    /*每行的数字需要互斥*/
+    for (int i = 1; i <= 9; ++i)
+        for (int k = 1; k <= 9; ++k)
+            for (int j = 1; j <= 8; ++j)
+                for (int j_ = j + 1; j_ <= 9; ++j_)
+                    fprintf(fp, "-%d%d%d -%d%d%d 0\n", i, j, k, i, j_, k);
     /*每列有全部的数字*/
     for (int j = 1; j <= 9; ++j)
         for (int k = 1; k <= 9; ++k)
@@ -284,12 +284,16 @@ void SudokuToCNF(const int **board)
                 fprintf(fp, "%d%d%d ", i, j, k);
             fprintf(fp, "0\n");
         }
+    /*每列的数字需要互斥*/
+    for (int j = 1; j <= 9; ++j)
+        for (int k = 1; k <= 9; ++k)
+            for (int i = 1; i <= 8; ++i)
+                for (int i_ = i + 1; i_ <= 9; ++i_)
+                    fprintf(fp, "-%d%d%d -%d%d%d 0\n", i, j, k, i_, j, k);
     /*每个格子有全部的数字*/
 
     for (int p = 0; p <= 2; ++p)
-    {
         for (int q = 0; q <= 2; ++q)
-        {
             for (int k = 1; k <= 9; ++k)
             {
                 for (int i = 1; i <= 3; ++i)
@@ -303,9 +307,34 @@ void SudokuToCNF(const int **board)
                 }
                 fprintf(fp, "0\n");
             }
-        }
-    }
 
+    /*每条对角线上有全部数字*/
+    for (int i = 1; i <= 9; ++i)
+    {
+        for (int k = 1; k <= 9; ++k)
+            fprintf(fp, "%d%d%d ", i, i, k);
+
+        fprintf(fp, "0\n");
+    }
+    for (int i = 1; i <= 9; ++i)
+    {
+        for (int k = 1; k <= 9; ++k)
+            fprintf(fp, "%d%d%d ", i, 10 - i, k);
+
+        fprintf(fp, "0\n");
+    }
+    /*每条对角线上的数字互斥*/
+    for (int k = 1; k <= 9; ++k)
+        for (int i = 1; i <= 8; ++i)
+            for (int i_ = i + 1; i_ <= 9; ++i_)
+                fprintf(fp, "-%d%d%d -%d%d%d 0\n", i, i, k, i_, i_, k);
+
+    for (int k = 1; k <= 9; ++k)
+        for (int i = 1; i <= 8; ++i)
+            for (int i_ = i + 1; i_ <= 9; ++i_)
+                fprintf(fp, "-%d%d%d -%d%d%d 0\n", i, 10 - i, k, i_,10 - i_, k);
+    
+    fclose(fp);
     printf("The Sudoku Pattern has already been transfer to cnf file!\n");
 }
 void solveXSudoku(int **board)
