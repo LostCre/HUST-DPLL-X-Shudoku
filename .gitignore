@@ -1,7 +1,7 @@
 .vscode/
 Doc/
 Answer/
-.json
-.o
-.exe
-.cnf
+*.json
+*.o
+*.exe
+*.cnf
