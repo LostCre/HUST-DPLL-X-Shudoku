@@ -155,7 +155,7 @@ bool generateByRow(int x, int y, int **board)
 
         if (y != 9) // 本行尚未生成结束
             flag = generateByRow(x, y + 1, board);
-        else        // 本行已经生成结束，跳转到下一行
+        else // 本行已经生成结束，跳转到下一行
             flag = generateByRow(x + 1, 1, board);
         if (!flag)
             board[x][y] = valid_val[k] = 0; // 重置回原来的数字，并删除该数字
@@ -208,4 +208,108 @@ void showSudoku(const int **board)
         }
         printf("\n");
     }
+}
+/*解决数独问题*/
+void SudokuToCNF(const int **board)
+{
+    const char *SudokuCNF = "Sudoku.cnf"; // 用于保存数独文件
+
+    FILE *fp;
+    if ((fp = fopen(SudokuCNF, "w")) == NULL)
+    {
+        fprintf(stderr, "Cannot open the file!");
+        exit(0);
+    }
+    fprintf(fp, "c X-Sudoku's CNF file\n");
+
+    int elem[82];
+    Position pos[82];
+    int count = 0;
+    /*开始检查有几个非 0 元素，并保存其位置*/
+    for (int i = 1; i <= 9; ++i)
+    {
+        for (int j = 1; j <= 9; ++j)
+        {
+            if (board[i][j] != 0)
+            {
+                count++;
+                pos[count].x = i;
+                pos[count].y = j;
+                elem[count] = board[i][j];
+            }
+        }
+    }
+    int n = 999;
+    int m = 6135 + count;
+    fprintf(fp, "p cnf %d %d\n", n, m);
+    /*先输出非0元素*/
+    for (int i = 1; i <= count; ++i)
+        fprintf(fp, "%d%d%d 0\n", pos[i].x, pos[i].y, elem[i]);
+
+    /*每个格子至少有一个数字*/
+    for (int i = 1; i <= 9; ++i)
+    {
+        for (int j = 1; j <= 9; ++j)
+        {
+            for (int k = 1; k <= 9; ++k)
+                fprintf(fp, "%d%d%d ", i, j, k);
+            fprintf(fp, "0\n");
+        }
+    }
+    /*每个格子最多只有一个数字*/
+    for (int i = 1; i <= 9; ++i)
+        for (int j = 1; j <= 9; ++j)
+            for (int k = 1; k <= 9; ++k)
+                for (int x = 1; x <= 9; ++x)
+                {
+                    if (x == k)
+                        continue;
+                    fprintf(fp, "-%d%d%d -%d%d%d 0\n", i, j, k, i, j, x);
+                }
+
+    /*每行有全部的数字*/
+    for (int i = 1; i <= 9; ++i)
+        for (int k = 1; k <= 9; ++k)
+        {
+            for (int j = 1; j <= 9; ++j)
+                fprintf(fp, "%d%d%d ", i, j, k);
+            fprintf(fp, "0\n");
+        }
+
+    /*每列有全部的数字*/
+    for (int j = 1; j <= 9; ++j)
+        for (int k = 1; k <= 9; ++k)
+        {
+            for (int i = 1; i <= 9; ++i)
+                fprintf(fp, "%d%d%d ", i, j, k);
+            fprintf(fp, "0\n");
+        }
+    /*每个格子有全部的数字*/
+
+    for (int p = 0; p <= 2; ++p)
+    {
+        for (int q = 0; q <= 2; ++q)
+        {
+            for (int k = 1; k <= 9; ++k)
+            {
+                for (int i = 1; i <= 3; ++i)
+                {
+                    for (int j = 1; j <= 3; ++j)
+                    {
+                        int x = 3 * p + i;
+                        int y = 3 * q + j;
+                        fprintf(fp, "%d%d%d ", x, y, k);
+                    }
+                }
+                fprintf(fp, "0\n");
+            }
+        }
+    }
+
+    printf("The Sudoku Pattern has already been transfer to cnf file!\n");
+}
+void solveXSudoku(int **board)
+{
+    SudokuToCNF(board);
+    // LinkHead *Head = cnfParser("Sudoku.cnf");
 }
