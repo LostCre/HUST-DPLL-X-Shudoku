@@ -8,7 +8,7 @@ extern int n, m;
 extern int *var;
 bool findContradiction;
 extern stack s;
-extern int *appear;
+// extern int *appear;
 
 bool UnitPropagate(LinkHead *Head)
 {
@@ -117,7 +117,7 @@ void deleteNode(LinkNode *p)
         return;
     }
 
-    appear[abs(p->data)]--; // 被删除的变元出现次数减一
+    // appear[abs(p->data)]--; // 被删除的变元出现次数减一
     
     LinkHead *head = p->head;
     LinkNode *q = head->next;
@@ -151,7 +151,7 @@ void simplifyLiteral(LinkHead *Head)
             while (q != NULL)
             {
                 LinkNode *temp = q;
-                appear[abs(q->data)]--; // 被删除的变元出现次数减一
+                // appear[abs(q->data)]--; // 被删除的变元出现次数减一
                 q = q->next;
                 free(temp);
             }
@@ -277,19 +277,21 @@ bool isEmpty(LinkHead *Head)
 }
 int chooseData(LinkHead *Head) // 选择一个出现次数最多的变量进行赋值
 {
-    int max_count = 0;
-    int max_v = 0;
-
-    for(int i = 1; i <= n; ++i)
+    int data = 0;
+    LinkHead *p = Head->next_head;
+    while(p != NULL && data == 0)
     {
-        if(var[i] == -1 && appear[i] > max_count)
+        LinkNode *q = p->next;
+        while(q != NULL && data == 0)
         {
-            max_count = appear[i];
-            max_v = i;
+            if(var[abs(q->data)] == -1)
+                data = abs(q->data);
+            q = q->next;
         }
+        p = p->next_head;
     }
 
-    return max_v;
+    return data;
 }
 void destoryCNF(LinkHead *head)
 {
@@ -341,7 +343,7 @@ bool DPLL(LinkHead *Head)
         }
         return false;
     }
-    appear[data]++;
+    // appear[data]++;
 
     LinkHead *newHead = literalCopy(Head, data);
     if (DPLL(newHead))
