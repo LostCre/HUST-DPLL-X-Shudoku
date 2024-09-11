@@ -261,8 +261,8 @@ int getBlockNumber(const Position pos)
 }
 bool digHoles(Position pos, int **board) // 使用从左到右从上到下开始挖洞的策略
 {
-    static int block_bound = 7;
-    static int upper_bound = 8; // 每 行/列 删除的最多数目
+    extern int block_bound; // 每个3*3格子最多删除个数
+    extern int upper_bound; // 每 行/列 删除的最多数目
     static int row[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     static int col[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     static int block[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};

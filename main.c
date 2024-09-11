@@ -7,6 +7,10 @@ int n;    // n为变量数量
 int m;    // m为子句数量
 int *var; // 各个布尔变元的真值情况
 stack s;  // 存放每次递归时被赋值的变量的编号
+int difficulty = 1;
+int block_bound;
+int upper_bound;
+bool canNotChanged[10][10];
 
 void menu(void)
 {
@@ -22,11 +26,42 @@ void DPLLMenu(void)
     printf("   1.Solve SAT        2. print CNF        0. exit    \n");
     printf("=====================================================\n");
 }
+void difficultyChoose(void)
+{
+    printf("=====================================================\n");
+    printf("             XSudoku Difficulty Option (Default:Easy)\n");
+    printf("    1: Easy           2: Medium           3: Hard    \n");
+    printf("                 4: Suuuuuuuuper Easy                \n");
+    printf("=====================================================\n");
+}
+void setDifficulty(int difficulty)
+{
+    switch (difficulty)
+    {
+    case 1:
+        block_bound = upper_bound = 5;
+        break;
+    case 2:
+        block_bound = upper_bound = 7;
+        break;
+    case 3:
+        block_bound = 9;
+        upper_bound = 7;
+        break;
+    case 4:
+        block_bound = 1;
+        upper_bound = 3;
+        break;
+    default: // 默认为简单
+        block_bound = upper_bound = 5;
+        break;
+    }
+}
 void SudokuMenu(void)
 {
     printf("=====================================================\n");
-    printf("                      X-Sudoku                       \n");
-    printf("1. Transfer to .cnf file     2.Get Answer     0. exit\n");
+    printf("                      X-Sudoku            (0 to exit)\n");
+    printf("1. Transfer to .cnf file     2.Get Answer     3.Play \n");
     printf("=====================================================\n");
 }
 void solve(int **board)
@@ -55,16 +90,107 @@ void solve(int **board)
     destroyStack(&s);
 
     printf("Here is the answer:\n");
-    showSudoku((const int **)board);
 }
+void input(int **table)
+{
+    printf("Which row do you want to fill:");
+    int x;
+    scanf("%d", &x);
+    while (x < 1 || x > 9)
+        printf("enter again : "), scanf("%d", &x);
+    printf("Which collum do you want to fill:");
+    int y;
+    scanf("%d", &y);
+    while (y < 1 || y > 9)
+        printf("enter again : "), scanf("%d", &y);
 
+    while (canNotChanged[x][y])
+    {
+        printf("enter again : ");
+        scanf("%d", &x);
+        while (x < 1 || x > 9)
+            printf("enter again : "), scanf("%d", &x);
+        printf("Which collum do you want to fill:");
+        scanf("%d", &y);
+        while (y < 1 || y > 9)
+            printf("enter again : "), scanf("%d", &y);
+    }
+
+    printf("What value do you want to fill:");
+    int val;
+    scanf("%d", &val);
+
+    table[x][y] = val;
+}
+bool check(int **table, int **board)
+{
+    for (int i = 1; i <= 9; ++i)
+    {
+        for (int j = 1; j <= 9; ++j)
+        {
+            if (table[i][j] != board[i][j])
+                return false;
+        }
+    }
+
+    return true;
+}
+void play(int **board)
+{   
+    /*创建副本，用于修改*/
+    int **table = (int **)malloc(sizeof(int *) * 10);
+    for (int i = 1; i <= 9; ++i)
+    {
+        table[i] = (int *)malloc(sizeof(int) * 10);
+        memcpy(table[i], board[i], 10 * sizeof(int));
+    }
+    /*防止修改到原来就填充的数字*/
+    for (int i = 1; i <= 9; ++i)
+        memset(canNotChanged[i], 0, sizeof(bool) * 10);
+
+    for(int i = 1; i <= 9; ++i)
+        for(int j = 1; j <= 9; ++j)
+            if(board[i][j] != 0)
+                canNotChanged[i][j] = true;
+
+    solve(board); // 得到求解的数独，便于检查
+
+    bool isCorrect = false;
+    bool showAnswer = false;
+    int choice = 1;
+    while (!isCorrect)
+    {
+        system("cls");
+        showSudoku(table);
+        printf("Enter 0 to show answer, others to continue playing:");
+        scanf("%d", &choice);
+        if(choice == 0)
+            showAnswer = true;
+
+        if(!showAnswer)
+        {
+            input(table);
+            isCorrect = check(table, board);
+        }
+        else
+        {
+            system("cls");
+            showSudoku(board);
+            break;
+        }
+    }
+
+    if(isCorrect)
+        printf("Correct!\n");
+        
+    for (int i = 1; i <= 9; ++i)
+        free(table[i]);
+    free(table);
+}
 int main(void)
 {
-    // menu();
 
     int choice = 9;
-    // scanf("%d", &choice);
-
     while (choice)
     {
         system("cls");
@@ -86,9 +212,10 @@ int main(void)
             initStack(&s, n);
             int choice = 9;
             while (choice)
-            {   
-                system("cls");
+            {
                 DPLLMenu();
+                scanf("%d", &choice);
+                system("cls");
                 if (choice == 1)
                 {
                     clock_t start, end;
@@ -118,15 +245,21 @@ int main(void)
                         printf("\n");
                     }
                 }
+                system("pause");
             }
-
-            system("pause");
         }
         break;
         case 2: // 数独问题
         {
             system("cls");
+            int difficulty;
+            difficultyChoose();
+            scanf("%d", &difficulty);
+            setDifficulty(difficulty);
+
+            system("cls");
             SudokuMenu();
+
             int **board = generateTermination();
             digHoles((Position){1, 1}, board);
             printf("X-Sudoku initial pattern:\n");
@@ -146,8 +279,13 @@ int main(void)
                 else if (choice == 2)
                 {
                     solve(board);
+                    showSudoku((const int **)board);
                     system("pause");
                     // break;
+                }
+                else if (choice == 3)
+                {
+                    play(board);
                 }
                 system("cls");
                 SudokuMenu();
@@ -155,7 +293,6 @@ int main(void)
         }
         break;
         }
-        // scanf("%d", &choice);
     }
 
     return 0;
