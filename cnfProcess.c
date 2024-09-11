@@ -2,7 +2,6 @@
 
 extern int n, m;       // n为文字数量，m为子句数量
 extern int *var;       // 各个布尔变元的真值情况
-int *appear;           // 记录每个变元出现的次数
 
 LinkHead *cnfParser(const char *fileName) // 解析cnf文件
 {
@@ -31,9 +30,6 @@ LinkHead *cnfParser(const char *fileName) // 解析cnf文件
     for (int i = 0; i <= n; ++i)
         pre[i] = NULL; // 初始化为NULL
 
-    appear = (int *)malloc(sizeof(int) * (n + 1)); // 记录每个变元出现的次数
-    memset(appear, 0, sizeof(int) * (n + 1));
-
     /*开始读入子句*/
     LinkHead *p;
     p = (LinkHead *)malloc(sizeof(LinkHead));
@@ -50,7 +46,6 @@ LinkHead *cnfParser(const char *fileName) // 解析cnf文件
         LinkNode *current;
         if (x != 0)
         {
-            appear[abs(x)]++;
             p->var_num++;
             p->next = (LinkNode *)malloc(sizeof(LinkNode));
 
@@ -75,7 +70,6 @@ LinkHead *cnfParser(const char *fileName) // 解析cnf文件
         fscanf(fp, " %d", &x);
         while (x != 0)
         {
-            appear[abs(x)] += 1;
             p->var_num++;
             current->next = (LinkNode *)malloc(sizeof(LinkNode));
             current = current->next;
