@@ -15,6 +15,13 @@ void menu(void)
     printf("  1. SAT Solver   2. Generate X-Sudoku   0. exit     \n");
     printf("=====================================================\n");
 }
+void DPLLMenu(void)
+{
+    printf("=====================================================\n");
+    printf("               SAT Solver by DPLL                    \n");
+    printf("   1.Solve SAT        2. print CNF        0. exit    \n");
+    printf("=====================================================\n");
+}
 void SudokuMenu(void)
 {
     printf("=====================================================\n");
@@ -77,18 +84,42 @@ int main(void)
 
             Head = cnfParser(filename); // 读取cnf文件
             initStack(&s, n);
+            int choice = 9;
+            while (choice)
+            {   
+                system("cls");
+                DPLLMenu();
+                if (choice == 1)
+                {
+                    clock_t start, end;
+                    start = clock();
+                    bool res = DPLL(Head);
+                    end = clock();
+                    double cost = (double)(end - start) / CLOCKS_PER_SEC * 1000;
+                    printRes(res, cost, resName);
+                    free(var);
+                    destoryCNF(Head);
+                    destroyStack(&s);
+                    printf("Done!\n");
+                }
+                else if (choice == 2)
+                {
+                    printf("n = %d, m = %d\n", n, m);
+                    LinkHead *head = Head->next_head;
+                    for (int i = 1; i <= m; ++i, head = head->next_head)
+                    {
+                        printf("No.%d :  ", i);
+                        LinkNode *p = head->next;
+                        while (p != NULL)
+                        {
+                            printf("%d ", p->data);
+                            p = p->next;
+                        }
+                        printf("\n");
+                    }
+                }
+            }
 
-            clock_t start, end;
-            start = clock();
-            bool res = DPLL(Head);
-            end = clock();
-            double cost = (double)(end - start) / CLOCKS_PER_SEC * 1000;
-            printRes(res, cost, resName);
-            free(var);
-            destoryCNF(Head);
-            destroyStack(&s);
-
-            printf("Done!\n");
             system("pause");
         }
         break;
