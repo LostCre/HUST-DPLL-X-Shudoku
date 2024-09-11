@@ -7,3 +7,4 @@ SAT_Solver.exe
 *.cnf
 *.res
 DPLL-Algorithm/
+test/
