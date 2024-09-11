@@ -1,3 +1,9 @@
 .vscode/
 Doc/
-.json
+*.json
+*.res
+*.cnf
+DPLL-Algorithm/
+Example/
+*.o
+*.exe
